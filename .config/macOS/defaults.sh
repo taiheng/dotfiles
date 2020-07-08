@@ -18,12 +18,12 @@ function configure_plist_apps() {
 
 function configure_iterm2() {
     defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -int 1
-    defaults write com.googlecode.iterm2 PrefsCustomFolder -string ~/.config/iTerm2
+    defaults write com.googlecode.iterm2 PrefsCustomFolder -string ${HOME}/.config/iTerm2
 }
 
 function configure_system() {
-    LOGIN_HOOK_PATH=~/configs/macOS/login_hook_script.sh
-    LOGOUT_HOOK_PATH=~/configs/macOS/logout_hook_script.sh
+    LOGIN_HOOK_PATH=${HOME}/configs/macOS/login_hook_script.sh
+    LOGOUT_HOOK_PATH=${HOME}/configs/macOS/logout_hook_script.sh
 
     # Disable Gatekeeper for getting rid of unknown developers error
     sudo spctl --master-disable
