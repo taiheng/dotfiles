@@ -9,6 +9,7 @@ brew "rbenv"
 brew "tmux"
 brew "vapor/tap/vapor"
 brew "heroku"
+brew "fzf"
 
 # launchgrid dev
 brew "asdf"
