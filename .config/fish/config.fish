@@ -4,5 +4,13 @@ if not functions -q fisher
     fish -c fisher
 end
 
-# Initialize rbenv
-status --is-interactive; and source (rbenv init -|psub)
+# set JAVA_HOME
+set -x JAVA_HOME (/usr/libexec/java_home)
+
+# Support for asdf
+source (brew --prefix asdf)/asdf.fish
+
+# Environment variables for android dev
+set -x ANDROID_HOME $HOME/Library/Android/sdk
+set -x ANDROID_NDK $ANDROID_HOME/ndk-bundle
+

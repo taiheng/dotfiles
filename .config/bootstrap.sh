@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 
-NOW=$(date +"%Y-%m-%d")
-LOGFILE="$$-$NOW.log"
-# Log everything with PID and date to a logfile
-exec &> >(tee -a "$LOGFILE")
-
-DOTFILES_REPO=$HOME/.dotfiles
-DOTFILES_WORKTREE='--git-dir=$DOTFILES_REPO --work-tree=$HOME'
-CONFIGS_DIR=$HOME/.config
+DOTFILES_REPO="${HOME}/.dotfiles"
+DOTFILES_WORKTREE="--git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
+CONFIGS_DIR="${HOME}/.config"
 
 main() {
     ask_for_sudo
@@ -18,8 +13,8 @@ main() {
     install_fonts
     install_homebrew
     install_packages_with_brewfile
+    add_asdf_plugins
     change_shell_to_fish
-    info "Full install logged here: ${LOGFILE}"
 }
 
 function ask_for_sudo() {
@@ -65,7 +60,7 @@ function clone_dotfiles_repo() {
         success "Pull successful in ${DOTFILES_REPO} repository"
     else
         url=https://github.com/taiheng/dotfiles.git
-        if git clone --bare "$url" $DOTFILES_REPO && \
+        if git clone --bare "${url}" $DOTFILES_REPO && \
            git -C $DOTFILES_REPO remote set-url origin git@github.com:taiheng/dotfiles.git && \
            git $DOTFILES_WORKTREE checkout; then
             success "Dotfiles repository cloned into ${DOTFILES_REPO}"
@@ -78,7 +73,7 @@ function clone_dotfiles_repo() {
 
 function pull_latest() {
     substep "Pulling latest changes in ${1} repository"
-    if git $DOTFILES_WORKTREE pull origin master &> /dev/null; then
+    if git $DOTFILES_WORKTREE pull origin work &> /dev/null; then
         return
     else
         error "Please pull latest changes in ${1} repository manually"
@@ -142,15 +137,14 @@ function install_packages_with_brewfile() {
         fi
     fi
 
-    # Using cask is questionable
-    if (echo $TAP; echo $BREW; echo $MAS) | parallel --verbose --linebuffer -j 3 brew bundle check --file={} &> /dev/null; then
+    if (echo $TAP; echo $BREW; echo $CASK; echo $MAS) | parallel --verbose --linebuffer -j 3 brew bundle check --file={} &> /dev/null; then
         success "Brewfile packages are already installed"
     else
         if brew bundle --file="$TAP"; then
             substep "Brewfile_tap installation succeeded"
 
             #export HOMEBREW_CASK_OPTS="--no-quarantine"
-            if (echo $BREW; echo $MAS) | parallel --verbose --linebuffer -j 2 brew bundle --file={}; then
+            if (echo $BREW; echo $CASK; echo $MAS) | parallel --verbose --linebuffer -j 2 brew bundle --file={}; then
                 success "Brewfile packages installation succeeded"
             else
                 error "Brewfile packages installation failed"
@@ -161,6 +155,23 @@ function install_packages_with_brewfile() {
             exit 1
         fi
     fi
+}
+
+function add_asdf_plugins() {
+    info "Adding asdf plugins"
+
+    # eSolutions
+    asdf plugin add ruby
+    asdf plugin add bundler
+    asdf plugin add python
+    asdf plugin add scala
+    asdf plugin add ccache
+    asdf plugin add cmake
+    asdf plugin add swiftlint
+    asdf plugin add ninja
+
+    # install global versions in ~/.tool-versions
+    asdf install
 }
 
 function change_shell_to_fish() {

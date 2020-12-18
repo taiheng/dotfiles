@@ -1,0 +1,8 @@
+ruby 2.5.1
+python 3.8.5
+bundler 2.1.4
+scala 2.12.12
+ccache 3.7.11
+cmake 3.16.8
+swiftlint 0.40.0
+ninja 1.10.2
