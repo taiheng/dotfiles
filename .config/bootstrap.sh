@@ -8,6 +8,7 @@ exec &> >(tee -a "$LOGFILE")
 DOTFILES_REPO=$HOME/.dotfiles
 DOTFILES_WORKTREE='--git-dir=$DOTFILES_REPO --work-tree=$HOME'
 CONFIGS_DIR=$HOME/.config
+ASDF_REPO=${HOME}/.asdf
 
 main() {
     ask_for_sudo
@@ -15,9 +16,9 @@ main() {
     #accept_xcode_license
     clone_dotfiles_repo
     setup_macOS_defaults
-    install_fonts
-    install_homebrew
-    install_packages_with_brewfile
+    check_macports_installed
+    install_packages_with_macports
+    install_asdf
     add_asdf_plugins
     change_shell_to_fish
     info "Full install logged here: ${LOGFILE}"
@@ -108,70 +109,54 @@ function install_fonts() {
     rsync --archive --verbose "${CONFIGS_DIR}/fonts/" "${FONT_DIR}"
 }
 
-function install_homebrew() {
-    info "Installing Homebrew"
-    if hash brew 2>/dev/null; then
-        success "Homebrew already exists"
+function check_macports_installed() {
+    if hash port 2>/dev/null; then
+        success "Macports installed"
     else
-        url=https://raw.githubusercontent.com/Homebrew/install/master/install
-        if yes | /usr/bin/ruby -e "$(curl -fsSL ${url})"; then
-            success "Homebrew installation succeeded"
-        else
-            error "Homebrew installation failed"
-            exit 1
-        fi
+        error "Please install Macports"
+        exit 1
     fi
 }
 
-function install_packages_with_brewfile() {
-    info "Installing Brewfile packages"
-    brew update
+function install_packages_with_macports() {
+    local PORT_COMMANDS=${CONFIGS_DIR}/macports/packages
 
-    local TAP=${CONFIGS_DIR}/brew/Brewfile_tap
-    local BREW=${CONFIGS_DIR}/brew/Brewfile_brew
-    local CASK=${CONFIGS_DIR}/brew/Brewfile_cask
-    local MAS=${CONFIGS_DIR}/brew/Brewfile_mas
-
-    if hash parallel 2>/dev/null; then
-        substep "parallel already exists"
+    if sudo port -N -F $PORT_COMMANDS; then
+        success "Macport packages installed and updated"
     else
-        if brew install parallel &> /dev/null; then
-            printf 'will cite' | parallel --citation &> /dev/null
-            substep "parallel installation succeeded"
+        error "Macport package installation failed"
+    fi
+}
+
+function install_asdf() {
+    info "Cloning asdf repo"
+
+    if test -e $ASDF_REPO; then
+        substep "${ASDF_REPO} already exists"
+        pull_latest $ASDF_REPO
+        success "Pull successful in ${DOTFILES_REPO} repository"
+    else
+        url=https://github.com/asdf-vm/asdf.git
+        if git clone "${url}" $ASDF_REPO && \
+            cd $ASDF_REPO && \
+            git checkout "$(git describe --abbrev=0 --tags)"; then
+            success "Asdf repository cloned into ${ASDF_REPO}"
         else
-            error "parallel installation failed"
+            error "Asdf repository cloning failed"
             exit 1
         fi
     fi
-
-    if (echo $TAP; echo $BREW; echo $CASK; echo $MAS) | parallel --verbose --linebuffer -j 3 brew bundle check --file={} &> /dev/null; then
-        success "Brewfile packages are already installed"
-    else
-        if brew bundle --file="$TAP"; then
-            substep "Brewfile_tap installation succeeded"
-
-            export HOMEBREW_CASK_OPTS="--no-quarantine"
-            if (echo $BREW; echo $CASK; echo $MAS) | parallel --verbose --linebuffer -j 2 brew bundle --file={}; then
-                success "Brewfile packages installation succeeded"
-            else
-                error "Brewfile packages installation failed"
-                exit 1
-            fi
-        else
-            error "Brewfile_tap installation failed"
-            exit 1
-        fi
-    fi
-
-    substep "Upgrade brewfile packages"
-    brew upgrade $(brew outdated)
-    brew cleanup
 }
 
 function add_asdf_plugins() {
     info "Adding asdf plugins"
+
+    . ${ASDF_REPO}/asdf.sh
+    
     # general ios dev tools
     asdf plugin add ruby
+    asdf plugin add bundler
+    asdf plugin add swiftlint
 
     # flutter dev
     asdf plugin add dart
@@ -180,6 +165,11 @@ function add_asdf_plugins() {
     # launchgrid dev
     asdf plugin add erlang
     asdf plugin add elixir
+    asdf plugin add nodejs
+
+    # other projects
+    asdf plugin add golang
+    asdf plugin add rust
 
     # install versions specified in global .tool-versions
     asdf install
@@ -205,7 +195,7 @@ function change_shell_to_fish() {
             fi
         fi
         substep "Switching shell to Fish for \"${user}\""
-        if sudo chsh -s /usr/local/bin/fish "$user"; then
+        if sudo chsh -s /opt/local/bin/fish "$user"; then
             success "Fish shell successfully set for \"${user}\""
         else
             error "Please try setting Fish shell again"

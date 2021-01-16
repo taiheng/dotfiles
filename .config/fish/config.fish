@@ -5,7 +5,7 @@ if not functions -q fisher
 end
 
 # Initialize asdf
-source (brew --prefix asdf)/asdf.fish
+source ~/.asdf/asdf.fish
 
 # Flutter dev
 set -x FLUTTER_ROOT (asdf where flutter)

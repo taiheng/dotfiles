@@ -1,3 +1,5 @@
 ruby 2.7.1
 flutter 1.17.5-stable
 dart 2.8.4
+golang 1.15.2
+rust 1.46.0
