@@ -124,6 +124,7 @@ function install_homebrew() {
 
 function install_packages_with_brewfile() {
     info "Installing Brewfile packages"
+    brew update
 
     local TAP=${CONFIGS_DIR}/brew/Brewfile_tap
     local BREW=${CONFIGS_DIR}/brew/Brewfile_brew
@@ -160,6 +161,10 @@ function install_packages_with_brewfile() {
             exit 1
         fi
     fi
+
+    substep "Upgrade brewfile packages"
+    brew upgrade $(brew outdated)
+    brew cleanup
 }
 
 function change_shell_to_fish() {
