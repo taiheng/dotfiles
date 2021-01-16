@@ -142,15 +142,14 @@ function install_packages_with_brewfile() {
         fi
     fi
 
-    # Using cask is questionable
-    if (echo $TAP; echo $BREW; echo $MAS) | parallel --verbose --linebuffer -j 3 brew bundle check --file={} &> /dev/null; then
+    if (echo $TAP; echo $BREW; echo $CASK; echo $MAS) | parallel --verbose --linebuffer -j 3 brew bundle check --file={} &> /dev/null; then
         success "Brewfile packages are already installed"
     else
         if brew bundle --file="$TAP"; then
             substep "Brewfile_tap installation succeeded"
 
-            #export HOMEBREW_CASK_OPTS="--no-quarantine"
-            if (echo $BREW; echo $MAS) | parallel --verbose --linebuffer -j 2 brew bundle --file={}; then
+            export HOMEBREW_CASK_OPTS="--no-quarantine"
+            if (echo $BREW; echo $CASK; echo $MAS) | parallel --verbose --linebuffer -j 2 brew bundle --file={}; then
                 success "Brewfile packages installation succeeded"
             else
                 error "Brewfile packages installation failed"

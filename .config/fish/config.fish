@@ -6,3 +6,4 @@ end
 
 # Initialize rbenv
 status --is-interactive; and source (rbenv init -|psub)
+source /usr/local/opt/asdf/asdf.fish
