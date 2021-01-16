@@ -4,6 +4,5 @@ if not functions -q fisher
     fish -c fisher
 end
 
-# Initialize rbenv
-status --is-interactive; and source (rbenv init -|psub)
-source /usr/local/opt/asdf/asdf.fish
+# Initialize asdf
+source (brew --prefix asdf)/asdf.fish

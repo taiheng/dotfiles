@@ -5,12 +5,15 @@ brew "handbrake"
 brew "mas"
 brew "parallel"
 brew "ruby-build"
-brew "rbenv"
 brew "tmux"
 brew "vapor/tap/vapor"
 brew "heroku"
 brew "fzf"
 
-# launchgrid dev
+# asdf
+brew "coreutils"
+brew "curl"
 brew "asdf"
+
+# launchgrid dev
 brew "npm"
