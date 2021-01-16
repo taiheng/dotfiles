@@ -6,7 +6,7 @@ On fresh macOS install:
 - Setup for a software development environment entirely with a one-liner 🔥
 
 ```
-curl --silent https://raw.githubusercontent.com/taiheng/dotfiles/master/configs/bootstrap.sh | bash
+curl --silent https://raw.githubusercontent.com/taiheng/dotfiles/master/.config/bootstrap.sh | bash
 ```
 
 ### Getting started
