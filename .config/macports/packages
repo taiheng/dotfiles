@@ -1,0 +1,5 @@
+sync
+selfupdate
+install fish git-lfs ffmpeg tmux coreutils curl carthage
+upgrade outdated
+clean
