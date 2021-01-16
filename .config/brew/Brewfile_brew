@@ -1,0 +1,8 @@
+brew "fish"
+brew "git-lfs"
+brew "mas"
+brew "parallel"
+brew "rbenv"
+brew "ruby-build"
+brew "tmux"
+brew "vapor/tap/vapor"
