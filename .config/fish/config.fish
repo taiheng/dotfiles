@@ -6,3 +6,6 @@ end
 
 # Initialize asdf
 source (brew --prefix asdf)/asdf.fish
+
+# Flutter dev
+set -x FLUTTER_ROOT (asdf where flutter)

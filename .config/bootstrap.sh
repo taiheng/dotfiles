@@ -18,6 +18,7 @@ main() {
     install_fonts
     install_homebrew
     install_packages_with_brewfile
+    add_asdf_plugins
     change_shell_to_fish
     info "Full install logged here: ${LOGFILE}"
 }
@@ -165,6 +166,23 @@ function install_packages_with_brewfile() {
     substep "Upgrade brewfile packages"
     brew upgrade $(brew outdated)
     brew cleanup
+}
+
+function add_asdf_plugins() {
+    info "Adding asdf plugins"
+    # general ios dev tools
+    asdf plugin add ruby
+
+    # flutter dev
+    asdf plugin add dart
+    asdf plugin add flutter
+
+    # launchgrid dev
+    asdf plugin add erlang
+    asdf plugin add elixir
+
+    # install versions specified in global .tool-versions
+    asdf install
 }
 
 function change_shell_to_fish() {
