@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-NOW=$(date +"%Y-%m-%d")
-LOGFILE="$$-$NOW.log"
-# Log everything with PID and date to a logfile
-exec &> >(tee -a "$LOGFILE")
-
 DOTFILES_REPO=$HOME/.dotfiles
 DOTFILES_WORKTREE='--git-dir=$DOTFILES_REPO --work-tree=$HOME'
 CONFIGS_DIR=$HOME/.config
@@ -21,7 +16,6 @@ main() {
     install_asdf
     add_asdf_plugins
     change_shell_to_fish
-    info "Full install logged here: ${LOGFILE}"
 }
 
 function ask_for_sudo() {
@@ -168,8 +162,8 @@ function add_asdf_plugins() {
     asdf plugin add nodejs
 
     # other projects
-    asdf plugin add golang
-    asdf plugin add rust
+    #asdf plugin add golang
+    #asdf plugin add rust
 
     # install versions specified in global .tool-versions
     asdf install
